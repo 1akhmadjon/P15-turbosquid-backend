@@ -1,0 +1,10 @@
+Using slugs in products use this codes for terminal
+-- python manage.py shell
+-- from main.models import Products
+-- from django.template.defaultfilters import slugify
+-- products = Products.objects.filter(slug=None)
+-- for product in products:
+--     product.slug = slugify(product.title)
+--     product.save()
+--
+-- exit()
