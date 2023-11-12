@@ -7,8 +7,6 @@ from rest_framework.permissions import IsAuthenticated
 from accounts.serializers import UserSerializer
 from rest_framework_simplejwt.tokens import RefreshToken
 
-
-
 User = get_user_model()
 
 
