@@ -1,9 +1,11 @@
 from os.path import splitext
-
+from django.contrib.auth.views import get_user_model
 from django.db import models
 from django.template.defaultfilters import slugify
 
 from mptt.models import MPTTModel, TreeForeignKey
+
+User = get_user_model()
 
 
 def slugify_upload(instance, filename):
@@ -52,3 +54,13 @@ class Sections(MPTTModel):
 
     def __str__(self):
         return self.name
+
+class Shoppingcart(models.Model):
+    product_id = models.ForeignKey(Products, on_delete=models.CASCADE)
+    user_id = models.ForeignKey(User, on_delete=models.CASCADE)
+
+    def __str__(self):
+        return self.user_id
+
+
+
