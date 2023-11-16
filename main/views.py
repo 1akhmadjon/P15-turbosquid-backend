@@ -41,6 +41,7 @@ class ProductDetailAPIView(GenericAPIView):
         todo_serializer = ProductSerializer(todo)
         return Response(todo_serializer.data)
 
+
 class ShoppingcartAPIView(APIView):
     permission_classes = (IsAuthenticated, )
 
@@ -49,6 +50,7 @@ class ShoppingcartAPIView(APIView):
         shoppingcart = Shoppingcart.objects.filter(user_id_id=user_id)
         shoppingcart_serializers = ShoppingcartSerializers(shoppingcart, many=True)
         return Response(shoppingcart_serializers.data)
+
 
 class AddShoppingcartAPIView(APIView):
     permission_classes = (IsAuthenticated, )
@@ -69,12 +71,3 @@ class AddShoppingcartAPIView(APIView):
             shoppingcart_serializers = ShoppingcartSerializers(shoppingcart)
             print(shoppingcart_serializers.data)
             return Response(shoppingcart_serializers.data)
-
-
-
-
-
-
-
-
-
