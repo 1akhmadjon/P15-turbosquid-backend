@@ -27,10 +27,15 @@ class Sections(MPTTModel):
 # This Model for sections at main page like [cars, characters, animals, vehicles, etc.] using MPTTModel
 class Category(MPTTModel):
     name = models.CharField(max_length=255)
-    section = models.ForeignKey(Sections, on_delete=models.CASCADE)
+    section = models.ForeignKey(Sections, on_delete=models.CASCADE, blank=True, null=True)
+    parent = TreeForeignKey('self', on_delete=models.CASCADE, null=True, blank=True, related_name='children')
 
     def __str__(self):
         return self.name
+
+    class Meta:
+        verbose_name = 'Category'
+        verbose_name_plural = 'Categories'
 
 
 class Products(models.Model):
@@ -38,7 +43,7 @@ class Products(models.Model):
     slug = models.SlugField(blank=True, null=True)
     description = models.TextField()
     price = models.IntegerField()
-    category = models.ForeignKey(Category, on_delete=models.CASCADE)
+    category = models.ForeignKey(Category, on_delete=models.CASCADE, blank=True, null=True)
     upload_at = models.DateTimeField(auto_now_add=True)
 
     def save(
