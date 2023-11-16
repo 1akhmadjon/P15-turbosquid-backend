@@ -15,9 +15,22 @@ def slugify_upload(instance, filename):
     return f"{folder}/{name_t}{ext}"
 
 
-class Image(models.Model):
-    image = models.ImageField(upload_to=slugify_upload, blank=True, null=True)
-    product = models.ForeignKey('Products', on_delete=models.CASCADE)
+# This Model created for sections filtered by types like [3d models, free 3d models, 3ds max models etc.]
+class Sections(MPTTModel):
+    name = models.CharField(max_length=255)
+    parent = TreeForeignKey('self', on_delete=models.CASCADE, null=True, blank=True)
+
+    def __str__(self):
+        return self.name
+
+
+# This Model for sections at main page like [cars, characters, animals, vehicles, etc.] using MPTTModel
+class Category(MPTTModel):
+    name = models.CharField(max_length=255)
+    section = models.ForeignKey(Sections, on_delete=models.CASCADE)
+
+    def __str__(self):
+        return self.name
 
 
 class Products(models.Model):
@@ -25,6 +38,7 @@ class Products(models.Model):
     slug = models.SlugField(blank=True, null=True)
     description = models.TextField()
     price = models.IntegerField()
+    category = models.ForeignKey(Category, on_delete=models.CASCADE)
     upload_at = models.DateTimeField(auto_now_add=True)
 
     def save(
@@ -38,6 +52,7 @@ class Products(models.Model):
         return self.title
 
 
+<<<<<<< Updated upstream
 # This Model created for sections filtered by types like [3d models, free 3d models, 3ds max models etc.]
 class SectionsByType(MPTTModel):
     name = models.CharField(max_length=255)
@@ -64,3 +79,8 @@ class Shoppingcart(models.Model):
 
 
 
+=======
+class Image(models.Model):
+    image = models.ImageField(upload_to=slugify_upload, blank=True, null=True)
+    product = models.ForeignKey('Products', on_delete=models.CASCADE)
+>>>>>>> Stashed changes
