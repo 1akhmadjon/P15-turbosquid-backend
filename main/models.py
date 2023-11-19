@@ -38,6 +38,10 @@ class Category(MPTTModel):
         verbose_name_plural = 'Categories'
 
 
+class ProductType(models.Model):
+    name = models.CharField(max_length=200)
+
+
 class Products(models.Model):
     title = models.CharField(max_length=255)
     slug = models.SlugField(blank=True, null=True)
@@ -45,6 +49,7 @@ class Products(models.Model):
     price = models.IntegerField()
     category = models.ForeignKey(Category, on_delete=models.CASCADE, blank=True, null=True)
     upload_at = models.DateTimeField(auto_now_add=True)
+    product_type = models.ForeignKey(ProductType, on_delete=models.CASCADE)
 
     def save(
             self, *args, **kwargs
@@ -68,3 +73,8 @@ class Shoppingcart(models.Model):
 class Image(models.Model):
     image = models.ImageField(upload_to=slugify_upload, blank=True, null=True)
     product = models.ForeignKey('Products', on_delete=models.CASCADE)
+
+
+class Subscribers(models.Model):
+    email = models.EmailField()
+    subscribed_at = models.DateTimeField(auto_now_add=True)
