@@ -5,7 +5,6 @@ from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.views import APIView
 from django.db.models import Q
-from django_elasticsearch_dsl_drf.viewsets import DocumentViewSet
 from django_elasticsearch_dsl_drf.filter_backends import (
     FilteringFilterBackend,
     SearchFilterBackend,
@@ -15,18 +14,13 @@ from django_elasticsearch_dsl_drf.constants import SUGGESTER_COMPLETION
 from django_elasticsearch_dsl_drf.viewsets import DocumentViewSet
 from django_elasticsearch_dsl_drf.pagination import PageNumberPagination
 
-from .models import Products, Shoppingcart, Subscription
 from .documents import DocumentProduct
-from .serializers import (
-    ProductSerializer,
-    ShoppingcartSerializers, EmailSerializer,
-    ProductDocumentSerializer
-)
+
 from drf_yasg.utils import swagger_auto_schema
 
-from main.models import Products, Shoppingcart, Sections, Category
-from .serializers import ProductSerializer, ShoppingcartSerializers, CategorySerializer, QuerySerializer, \
-    SectionSerializer, ProductSerializerForRetrieve
+from main.models import Products, Shoppingcart, Sections, Category, Subscription
+from .serializers import ProductSerializer, ShoppingcartSerializers, CategorySerializer, QuerySerializer, EmailSerializer, ProductDocumentSerializer, \
+    SectionSerializer
 
 
 class ProductAPIView(GenericAPIView):

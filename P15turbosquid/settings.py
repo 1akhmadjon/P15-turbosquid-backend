@@ -222,13 +222,3 @@ ELASTICSEARCH_INDEX_NAMES = {
     'main.DocumentProduct': 'main'
 }
 
-CELERY_RESULT_BACKEND = 'redis://redis:6379/0'
-CELERY_BROKER_URL = 'redis://redis:6379/0'
-CELERY_TIMEZONE = TIME_ZONE
-
-EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
-EMAIL_HOST = 'smtp.gmail.com'
-EMAIL_USE_TLS = True
-EMAIL_PORT = 587
-EMAIL_HOST_USER = os.getenv('email')
-EMAIL_HOST_PASSWORD = os.getenv('email_key')
