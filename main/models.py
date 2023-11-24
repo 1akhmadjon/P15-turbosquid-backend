@@ -42,6 +42,10 @@ class ProductType(models.Model):
     name = models.CharField(max_length=200, blank=True, null=True)
 
 
+class Format(models.Model):
+    format = models.CharField(max_length=100, blank=True, null=True)
+
+
 class Products(models.Model):
     title = models.CharField(max_length=255)
     slug = models.SlugField(blank=True, null=True)
@@ -49,7 +53,11 @@ class Products(models.Model):
     price = models.IntegerField()
     category = models.ForeignKey(Category, on_delete=models.CASCADE, blank=True, null=True)
     upload_at = models.DateTimeField(auto_now_add=True)
+<<<<<<< Updated upstream
     product_type = models.ForeignKey(ProductType, on_delete=models.CASCADE, blank=True, null=True)
+=======
+    format = models.ForeignKey('Format', on_delete=models.CASCADE, blank=True, null=True)
+>>>>>>> Stashed changes
 
     def save(
             self, *args, **kwargs
@@ -79,6 +87,7 @@ class Image(models.Model):
     product = models.ForeignKey('Products', on_delete=models.CASCADE)
 
 
+<<<<<<< Updated upstream
 class UserBalance(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE)
     balance = models.FloatField(default=10000)
@@ -88,6 +97,12 @@ class Order(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE)
     product = models.ForeignKey(Products, on_delete=models.CASCADE)
     created_at = models.DateTimeField(auto_now_add=True)
+=======
+
+class Shoppingcart(models.Model):
+    product_id = models.ForeignKey(Products, on_delete=models.CASCADE)
+    user_id = models.ForeignKey(User, on_delete=models.CASCADE)
+>>>>>>> Stashed changes
 
     def __str__(self):
         return self.product.title
@@ -97,7 +112,14 @@ class ArchiveShoppingcart(models.Model):
     product = models.ForeignKey(Shoppingcart, on_delete=models.CASCADE)
     user = models.ForeignKey(Shoppingcart, on_delete=models.CASCADE)
 
+class Comment(models.Model):
+    message = models.TextField()
+    user = models.ForeignKey(User, on_delete=models.CASCADE, blank=True, null=True)
+    created_at = models.DateTimeField(auto_now_add=True)
+    product = models.ForeignKey(Products, on_delete=models.CASCADE, blank=True, null=True)
 
+
+<<<<<<< Updated upstream
 class Subscription(models.Model):
     email = models.EmailField()
     subscribed_at = models.DateTimeField(auto_now_add=True)
@@ -105,3 +127,9 @@ class Subscription(models.Model):
     def __str__(self):
         return self.email
  
+=======
+class Like(models.Model):
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    product = models.ForeignKey(Products, on_delete=models.CASCADE)
+    created_at = models.DateTimeField(auto_now_add=True)
+>>>>>>> Stashed changes
