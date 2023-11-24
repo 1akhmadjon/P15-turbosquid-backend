@@ -12,7 +12,7 @@ from main.views import (
     ProductSearchViewSet,
     GetSectionsAPIView,
     SectionsAPIView,
-    CategoriesAPIView
+    CategoriesAPIView, ProductSingleAPIView
 )
 
 router = routers.DefaultRouter(trailing_slash=False)
@@ -29,5 +29,6 @@ urlpatterns = [
     path('add-shopping', AddShoppingcartAPIView.as_view(), name='add-shopping'),
     path('product-update/<int:pk>', ProductUpdateAPIView.as_view(), name='product_update'),
     path('subscribe', SubscribeAPIView.as_view(), name='subscribe'),
+    path('product-single/<int:pk>', ProductSingleAPIView.as_view(), name='product_single'),
     path('', include(router.urls))
 ]
