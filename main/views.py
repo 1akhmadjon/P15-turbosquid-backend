@@ -26,7 +26,7 @@ from drf_yasg.utils import swagger_auto_schema
 
 from main.models import Products, Shoppingcart, Sections, Category
 from .serializers import ProductSerializer, ShoppingcartSerializers, CategorySerializer, QuerySerializer, \
-    SectionSerializer
+    SectionSerializer, ProductSerializerForRetrieve
 
 
 class ProductAPIView(GenericAPIView):
@@ -34,9 +34,9 @@ class ProductAPIView(GenericAPIView):
     serializer_class = ProductSerializer
 
     def get(self, request):
-        todos = Products.objects.all()
-        todos_data = ProductSerializer(todos, many=True)
-        return Response(todos_data.data)
+        product = Products.objects.all()
+        product_data = ProductSerializer(product, many=True)
+        return Response(product_data.data)
 
 
 class AddProductView(GenericAPIView):
@@ -56,11 +56,11 @@ class ProductDetailAPIView(GenericAPIView):
 
     def get(self, request, slug):
         try:
-            todo = Products.objects.get(slug=slug)
+            product = Products.objects.get(slug=slug)
         except Products.DoesNotExist:
             return Response({'success': False}, status=404)
-        todo_serializer = ProductSerializer(todo)
-        return Response(todo_serializer.data)
+        product_serializer = ProductSerializer(product)
+        return Response(product_serializer.data)
 
 
 class ShoppingcartAPIView(APIView):
@@ -123,12 +123,12 @@ class ProductUpdateAPIView(GenericAPIView):
         product.save()
         product_serializer = ProductSerializer(product)
         return Response(product_serializer.data)
-
     
     def delete(self, request, pk):
         Products.objects.get(pk=pk).delete()
         return Response(status=204)
-    
+
+
 class GetSectionsAPIView(GenericAPIView):
     permission_classes = ()
     serializer_class = SectionSerializer
@@ -137,6 +137,7 @@ class GetSectionsAPIView(GenericAPIView):
         sections = Sections.objects.all()
         sections_serializer = SectionSerializer(sections, many=True)
         return Response(sections_serializer.data)
+
 
 class SectionsAPIView(GenericAPIView):
     permission_classes = ()
@@ -221,6 +222,7 @@ class SubscribeAPIView(GenericAPIView):
         else:
             return Response({'success': False, 'message': 'Already subscribed!'}, status=400)
         return Response({'success': True, 'message': 'Successfully subscribed :)'})
+
 
 class CategoriesAPIView(GenericAPIView):
     permission_classes = ()

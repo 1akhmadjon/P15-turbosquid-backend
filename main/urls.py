@@ -9,7 +9,10 @@ from main.views import (
     AddShoppingcartAPIView,
     ProductUpdateAPIView,
     SubscribeAPIView,
-    ProductSearchViewSet
+    ProductSearchViewSet,
+    GetSectionsAPIView,
+    SectionsAPIView,
+    CategoriesAPIView
 )
 
 router = routers.DefaultRouter(trailing_slash=False)

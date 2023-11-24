@@ -39,7 +39,7 @@ class Category(MPTTModel):
 
 
 class ProductType(models.Model):
-    name = models.CharField(max_length=200)
+    name = models.CharField(max_length=200, blank=True, null=True)
 
 
 class Products(models.Model):
@@ -49,7 +49,7 @@ class Products(models.Model):
     price = models.IntegerField()
     category = models.ForeignKey(Category, on_delete=models.CASCADE, blank=True, null=True)
     upload_at = models.DateTimeField(auto_now_add=True)
-    product_type = models.ForeignKey(ProductType, on_delete=models.CASCADE)
+    product_type = models.ForeignKey(ProductType, on_delete=models.CASCADE, blank=True, null=True)
 
     def save(
             self, *args, **kwargs
