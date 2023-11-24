@@ -21,7 +21,12 @@ from drf_yasg.utils import swagger_auto_schema
 from main.models import Products, Shoppingcart, Sections, Category, Subscription
 from .serializers import ProductSerializer, ShoppingcartSerializers, CategorySerializer, QuerySerializer, EmailSerializer, ProductDocumentSerializer, \
     SectionSerializer
+from django.contrib.auth.views import get_user_model
 
+from main.models import Products, Shoppingcart, Order, UserBalance, Image, ArchiveShoppingcart
+from .serializers import ProductSerializer, ShoppingcartSerializers
+
+User = get_user_model()
 
 class ProductAPIView(GenericAPIView):
     permission_classes = ()
@@ -62,7 +67,7 @@ class ShoppingcartAPIView(APIView):
 
     def get(self, request):
         user_id = request.user.id
-        shoppingcart = Shoppingcart.objects.filter(user_id_id=user_id)
+        shoppingcart = Shoppingcart.objects.filter(user_id=user_id)
         shoppingcart_serializers = ShoppingcartSerializers(shoppingcart, many=True)
         return Response(shoppingcart_serializers.data)
 
@@ -73,14 +78,14 @@ class AddShoppingcartAPIView(APIView):
     def post(self, request):
         user_id = request.user.id
         product_id = request.POST.get('product_id')
-        if Shoppingcart.objects.filter(Q(user_id_id=user_id) & Q(product_id_id=product_id)).exists():
-            shoppingcart = Shoppingcart.objects.get(Q(user_id_id=user_id) & Q(product_id_id=product_id))
+        if Shoppingcart.objects.filter(Q(user_id=user_id) & Q(product_id=product_id)).exists():
+            shoppingcart = Shoppingcart.objects.get(Q(user_id=user_id) & Q(product_id=product_id))
             shoppingcart_serializers = ShoppingcartSerializers(shoppingcart)
             return Response(shoppingcart_serializers.data)
         else:
             shoppingcart = Shoppingcart.objects.create(
-                product_id_id=product_id,
-                user_id_id=user_id
+                product_id=product_id,
+                user_id=user_id
             )
             shoppingcart.save()
             shoppingcart_serializers = ShoppingcartSerializers(shoppingcart)
@@ -131,7 +136,54 @@ class GetSectionsAPIView(GenericAPIView):
         sections = Sections.objects.all()
         sections_serializer = SectionSerializer(sections, many=True)
         return Response(sections_serializer.data)
+class CheckoutShoppingcart(APIView):
+    permission_classes = (IsAuthenticated, )
 
+    def delete(self, request, product_id):
+        user_id = request.user.id
+        if not Shoppingcart.objects.filter(Q(user_id=user_id) & Q(product_id=product_id)).exists():
+            return Response({'success': False, 'error': 'This user has no products with this id in their shopping cart'}, status=404)
+        else:
+            Shoppingcart.objects.get(Q(user_id=user_id) & Q(product_id=product_id)).delete()
+            return Response({'success': True}, status=204)
+
+
+class OrderAPIView(APIView):
+    permission_classes = (IsAuthenticated, )
+    def post(self, request):
+        user = request.user.id
+        total_price = 0
+        user_shoppingcart = Shoppingcart.objects.filter(user_id=user)
+        products = []
+        for i in user_shoppingcart.values():
+            product_id = i['product_id']
+            product = Products.objects.filter(id=product_id)
+            products += product.values()
+        for i in products:
+            total_price += i['price']
+
+        user_wallet = UserBalance.objects.filter(user=user)
+        user_wallet=user_wallet[0]
+        user_balance = user_wallet.balance
+        if total_price > user_balance:
+            return Response({'success': False, 'error': 'Not enough money'})
+        else:
+            for i in user_shoppingcart:
+                order = Order.objects.create(
+                    user=request.user,
+                    product=i.product,
+                )
+                order.save()
+                product_id=i.product_id
+                Shoppingcart.objects.get(product=product_id).delete()
+                archiveshoppingcart = ArchiveShoppingcart.objects.create(
+                    product=product_id,
+                    user=user
+                )
+                archiveshoppingcart.save()
+                user_balance = int(user_balance) - int(total_price)
+                user_wallet.balance = user_balance
+                user_wallet.save()
 
 class SectionsAPIView(GenericAPIView):
     permission_classes = ()

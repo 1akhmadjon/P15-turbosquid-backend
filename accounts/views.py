@@ -19,6 +19,7 @@ class RegisterAPIView(APIView):
         username = request.POST.get('username')
         password1 = request.POST.get('password1')
         password2 = request.POST.get('password2')
+        balance = request.POST.get('balance')
 
         if password1 == password2:
             if User.objects.filter(username=username).exists():
@@ -31,7 +32,8 @@ class RegisterAPIView(APIView):
                     last_name=last_name,
                     email=email,
                     username=username,
-                    password=password1
+                    password=password1,
+                    balance=balance
                 )
                 user_serializer = UserSerializer(user)
                 return Response({'success': True, 'data': user_serializer.data})
