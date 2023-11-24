@@ -1,8 +1,27 @@
+import datetime
+
 from rest_framework.generics import GenericAPIView
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.views import APIView
 from django.db.models import Q
+from django_elasticsearch_dsl_drf.viewsets import DocumentViewSet
+from django_elasticsearch_dsl_drf.filter_backends import (
+    FilteringFilterBackend,
+    SearchFilterBackend,
+    SuggesterFilterBackend,
+)
+from django_elasticsearch_dsl_drf.constants import SUGGESTER_COMPLETION
+from django_elasticsearch_dsl_drf.viewsets import DocumentViewSet
+from django_elasticsearch_dsl_drf.pagination import PageNumberPagination
+
+from .models import Products, Shoppingcart, Subscription
+from .documents import DocumentProduct
+from .serializers import (
+    ProductSerializer,
+    ShoppingcartSerializers, EmailSerializer,
+    ProductDocumentSerializer
+)
 from drf_yasg.utils import swagger_auto_schema
 
 from main.models import Products, Shoppingcart, Sections, Category
@@ -45,7 +64,7 @@ class ProductDetailAPIView(GenericAPIView):
 
 
 class ShoppingcartAPIView(APIView):
-    permission_classes = (IsAuthenticated, )
+    permission_classes = (IsAuthenticated,)
 
     def get(self, request):
         user_id = request.user.id
@@ -55,7 +74,7 @@ class ShoppingcartAPIView(APIView):
 
 
 class AddShoppingcartAPIView(APIView):
-    permission_classes = (IsAuthenticated, )
+    permission_classes = (IsAuthenticated,)
 
     def post(self, request):
         user_id = request.user.id
@@ -71,10 +90,45 @@ class AddShoppingcartAPIView(APIView):
             )
             shoppingcart.save()
             shoppingcart_serializers = ShoppingcartSerializers(shoppingcart)
-            print(shoppingcart_serializers.data)
             return Response(shoppingcart_serializers.data)
 
 
+class ProductUpdateAPIView(GenericAPIView):
+    serializer_class = ProductSerializer
+    
+    def get(self, request, pk):
+        product = Products.objects.get(pk=pk)
+        product_serializer = ProductSerializer(product)
+        return Response(product_serializer.data)
+    
+    def put(self, request, pk):
+        title = request.POST.get('title')
+        description = request.POST.get('description')
+        product = Products.objects.get(pk=pk)
+        product.title = title
+        product.description = description
+        product.expires_at = datetime.datetime.now()
+        product.save()
+        product_serializer = ProductSerializer(product)
+        return Response(product_serializer.data)
+    
+    def patch(self, request, pk):
+        title = request.POST.get('title', None)
+        description = request.POST.get('description', None)
+        product = Products.objects.get(pk=pk)
+        if title:
+            product.title = title
+        if description:
+            product.description = description
+        product.save()
+        product_serializer = ProductSerializer(product)
+        return Response(product_serializer.data)
+
+    
+    def delete(self, request, pk):
+        Products.objects.get(pk=pk).delete()
+        return Response(status=204)
+    
 class GetSectionsAPIView(GenericAPIView):
     permission_classes = ()
     serializer_class = SectionSerializer
@@ -83,7 +137,6 @@ class GetSectionsAPIView(GenericAPIView):
         sections = Sections.objects.all()
         sections_serializer = SectionSerializer(sections, many=True)
         return Response(sections_serializer.data)
-
 
 class SectionsAPIView(GenericAPIView):
     permission_classes = ()
@@ -97,6 +150,77 @@ class SectionsAPIView(GenericAPIView):
         section_serializer = SectionSerializer(categories, many=True)
         return Response(section_serializer.data)
 
+
+class CustomPageNumberPagination(PageNumberPagination):
+    page_size = 10
+    page_size_query_param = 'page_size'
+    max_page_size = 100
+
+
+class ProductSearchViewSet(DocumentViewSet):
+    document = DocumentProduct
+    serializer_class = ProductDocumentSerializer
+    pagination_class = CustomPageNumberPagination
+
+    filter_backends = [
+        FilteringFilterBackend,
+        SearchFilterBackend,
+        SuggesterFilterBackend,
+    ]
+
+    search_fields = (
+        'title',
+        'slug',
+        'description',
+        'price',
+    )
+
+    filter_fields = {
+        'title': 'title',
+        'slug': 'slug',
+        'description': 'description',
+        'price': 'price',
+    }
+
+    suggester_fields = {
+        'title': {
+            'field': 'title.suggest',
+            'suggesters': [
+                SUGGESTER_COMPLETION,
+            ],
+        },
+        'slug': {
+            'field': 'slug.suggest',
+            'suggesters': [
+                SUGGESTER_COMPLETION,
+            ],
+        }
+    }
+
+    def list(self, request, *args, **kwargs):
+        search_term = self.request.query_params.get('search', '')
+        query = Q('multi_match', query=search_term, fields=self.search_fields)
+        queryset = self.filter_queryset(self.get_queryset().query(query))
+        page = self.paginate_queryset(queryset)
+        if page is not None:
+            serializer = self.get_serializer(page, many=True)
+            return self.get_paginated_response(serializer.data)
+        serializer = self.get_serializer(queryset, many=True)
+        return Response(serializer.data)
+
+
+class SubscribeAPIView(GenericAPIView):
+    serializer_class = EmailSerializer
+    permission_classes = ()
+
+    def post(self, request):
+        if not Subscription.objects.filter(email=request.data['email']).exists():
+            email_serializer = self.serializer_class(data=request.data)
+            email_serializer.is_valid(raise_exception=True)
+            email_serializer.save()
+        else:
+            return Response({'success': False, 'message': 'Already subscribed!'}, status=400)
+        return Response({'success': True, 'message': 'Successfully subscribed :)'})
 
 class CategoriesAPIView(GenericAPIView):
     permission_classes = ()
