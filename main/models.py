@@ -61,10 +61,14 @@ class Products(models.Model):
     def __str__(self):
         return self.title
 
+    class Meta:
+        verbose_name = 'Products'
+        verbose_name_plural = 'Products'
+
 
 class Shoppingcart(models.Model):
-    product_id = models.ForeignKey(Products, on_delete=models.CASCADE)
-    user_id = models.ForeignKey(User, on_delete=models.CASCADE)
+    product = models.ForeignKey(Products, on_delete=models.CASCADE)
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
 
     def __str__(self):
         return self.user_id
@@ -73,6 +77,25 @@ class Shoppingcart(models.Model):
 class Image(models.Model):
     image = models.ImageField(upload_to=slugify_upload, blank=True, null=True)
     product = models.ForeignKey('Products', on_delete=models.CASCADE)
+
+
+class UserBalance(models.Model):
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    balance = models.FloatField(default=10000)
+
+
+class Order(models.Model):
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    product = models.ForeignKey(Products, on_delete=models.CASCADE)
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    def __str__(self):
+        return self.product.title
+
+
+class ArchiveShoppingcart(models.Model):
+    product = models.ForeignKey(Shoppingcart, on_delete=models.CASCADE)
+    user = models.ForeignKey(Shoppingcart, on_delete=models.CASCADE)
 
 
 class Subscription(models.Model):
