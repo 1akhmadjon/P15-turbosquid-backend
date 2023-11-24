@@ -22,6 +22,11 @@ from .serializers import (
     ShoppingcartSerializers, EmailSerializer,
     ProductDocumentSerializer
 )
+from drf_yasg.utils import swagger_auto_schema
+
+from main.models import Products, Shoppingcart, Sections, Category
+from .serializers import ProductSerializer, ShoppingcartSerializers, CategorySerializer, QuerySerializer, \
+    SectionSerializer
 
 
 class ProductAPIView(GenericAPIView):
@@ -90,12 +95,12 @@ class AddShoppingcartAPIView(APIView):
 
 class ProductUpdateAPIView(GenericAPIView):
     serializer_class = ProductSerializer
-
+    
     def get(self, request, pk):
         product = Products.objects.get(pk=pk)
         product_serializer = ProductSerializer(product)
         return Response(product_serializer.data)
-
+    
     def put(self, request, pk):
         title = request.POST.get('title')
         description = request.POST.get('description')
@@ -106,7 +111,7 @@ class ProductUpdateAPIView(GenericAPIView):
         product.save()
         product_serializer = ProductSerializer(product)
         return Response(product_serializer.data)
-
+    
     def patch(self, request, pk):
         title = request.POST.get('title', None)
         description = request.POST.get('description', None)
@@ -119,9 +124,31 @@ class ProductUpdateAPIView(GenericAPIView):
         product_serializer = ProductSerializer(product)
         return Response(product_serializer.data)
 
+    
     def delete(self, request, pk):
         Products.objects.get(pk=pk).delete()
         return Response(status=204)
+    
+class GetSectionsAPIView(GenericAPIView):
+    permission_classes = ()
+    serializer_class = SectionSerializer
+
+    def get(self, request):
+        sections = Sections.objects.all()
+        sections_serializer = SectionSerializer(sections, many=True)
+        return Response(sections_serializer.data)
+
+class SectionsAPIView(GenericAPIView):
+    permission_classes = ()
+    serializer_class = CategorySerializer
+
+    @swagger_auto_schema(query_serializer=QuerySerializer)
+    def get(self, request):
+        query = request.GET.get('query')
+        sections = Sections.objects.filter(Q(name=query) & Q(parent=None))
+        categories = Category.objects.filter(section__in=sections)
+        section_serializer = SectionSerializer(categories, many=True)
+        return Response(section_serializer.data)
 
 
 class CustomPageNumberPagination(PageNumberPagination):
@@ -194,3 +221,16 @@ class SubscribeAPIView(GenericAPIView):
         else:
             return Response({'success': False, 'message': 'Already subscribed!'}, status=400)
         return Response({'success': True, 'message': 'Successfully subscribed :)'})
+
+class CategoriesAPIView(GenericAPIView):
+    permission_classes = ()
+    serializer_class = CategorySerializer
+
+    @swagger_auto_schema(query_serializer=QuerySerializer)
+    def get(self, request):
+        query = request.GET.get('query')
+        categories = Category.objects.filter(Q(name=query) & Q(parent=None))
+        products = Products.objects.filter(category__in=categories)
+        product_serializer = ProductSerializer(products, many=True)
+        return Response(product_serializer.data)
+

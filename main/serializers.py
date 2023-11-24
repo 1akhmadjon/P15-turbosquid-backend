@@ -1,5 +1,7 @@
 from django_elasticsearch_dsl_drf.serializers import DocumentSerializer
 from rest_framework import serializers
+from .models import Products, Shoppingcart, Category, Sections, Subscribers
+from .tasks import send_email
 
 from .documents import DocumentProduct
 from .models import (
@@ -25,7 +27,6 @@ class ProductSerializer(serializers.ModelSerializer):
         todo_serializer = ProductSerializerForRetrieve(todo)
         send_email.delay(subscriber_emails, todo_serializer.data)
         return todo
-
     class Meta:
         model = Products
         fields = '__all__'
@@ -52,3 +53,18 @@ class ProductDocumentSerializer(DocumentSerializer):
     class Meta:
         document = DocumentProduct
         fields = ('title', 'slug', 'description', 'price')
+        
+class SectionSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Sections
+        fields = '__all__'
+
+
+class CategorySerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Category
+        fields = '__all__'
+
+
+class QuerySerializer(serializers.Serializer):
+    query = serializers.CharField()
