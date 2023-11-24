@@ -68,3 +68,11 @@ class Shoppingcart(models.Model):
 class Image(models.Model):
     image = models.ImageField(upload_to=slugify_upload, blank=True, null=True)
     product = models.ForeignKey('Products', on_delete=models.CASCADE)
+
+
+class Subscription(models.Model):
+    email = models.EmailField()
+    subscribed_at = models.DateTimeField(auto_now_add=True)
+
+    def __str__(self):
+        return self.email
