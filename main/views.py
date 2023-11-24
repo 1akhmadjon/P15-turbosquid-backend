@@ -110,3 +110,18 @@ class CategoriesAPIView(GenericAPIView):
         product_serializer = ProductSerializer(products, many=True)
         return Response(product_serializer.data)
 
+
+class ProductSingleAPIView(GenericAPIView):
+    permission_classes = ()
+
+    def get(self, request, pk):
+        product = Products.objects.filter(pk=pk).first()
+        sections = {
+            'id': product.id,
+            'title': product.title,
+            'description': product.description,
+            'price': product.price,
+            'category': product.category.name,
+            'section': product.category.section.name
+        }
+        return Response(sections)
