@@ -1,14 +1,15 @@
 from django_elasticsearch_dsl_drf.serializers import DocumentSerializer
 from rest_framework import serializers
 
-<<<<<<< Updated upstream
 from .documents import DocumentProduct
 from .models import (
     Products,
     Shoppingcart,
     Subscription,
     Sections,
-    Category
+    Category,
+    Comment,
+    Like
 )
 from .tasks import send_email
 
@@ -17,9 +18,6 @@ class ProductSerializerForRetrieve(serializers.ModelSerializer):
     class Meta:
         model = Products
         fields = '__all__'
-=======
-from .models import Products, Shoppingcart, Comment, Like
->>>>>>> Stashed changes
 
 
 class ProductSerializer(serializers.ModelSerializer):
@@ -43,7 +41,6 @@ class ShoppingcartSerializers(serializers.ModelSerializer):
         fields = '__all__'
 
 
-<<<<<<< Updated upstream
 class EmailSerializer(serializers.ModelSerializer):
     class Meta:
         model = Subscription
@@ -75,7 +72,8 @@ class CategorySerializer(serializers.ModelSerializer):
 
 class QuerySerializer(serializers.Serializer):
     query = serializers.CharField()
-=======
+
+
 class CommentSerializer(serializers.ModelSerializer):
     class Meta:
         model = Comment
@@ -86,4 +84,3 @@ class LikeSerializer(serializers.ModelSerializer):
     class Meta:
         model = Like
         fields = '__all__'
->>>>>>> Stashed changes

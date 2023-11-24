@@ -5,7 +5,6 @@ from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.views import APIView
 from django.db.models import Q
-<<<<<<< Updated upstream
 from django_elasticsearch_dsl_drf.filter_backends import (
     FilteringFilterBackend,
     SearchFilterBackend,
@@ -26,7 +25,6 @@ from django.contrib.auth.views import get_user_model
 
 from main.models import Products, Shoppingcart, Order, UserBalance, Image, ArchiveShoppingcart
 from .serializers import ProductSerializer, ShoppingcartSerializers
-=======
 from rest_framework.generics import RetrieveUpdateDestroyAPIView, ListAPIView
 from main.models import Products, Shoppingcart, Comment, Like
 from .product_filters import ProductsFilter
@@ -34,7 +32,6 @@ from .serializers import ProductSerializer, ShoppingcartSerializers, CommentSeri
 from rest_framework import viewsets
 from django_filters import rest_framework as filters
 from rest_framework import generics, status
->>>>>>> Stashed changes
 
 User = get_user_model()
 
@@ -103,7 +100,6 @@ class AddShoppingcartAPIView(APIView):
             return Response(shoppingcart_serializers.data)
 
 
-<<<<<<< Updated upstream
 class ProductUpdateAPIView(GenericAPIView):
     serializer_class = ProductSerializer
     
@@ -122,38 +118,7 @@ class ProductUpdateAPIView(GenericAPIView):
         product.save()
         product_serializer = ProductSerializer(product)
         return Response(product_serializer.data)
-    
-=======
-class ProductUpdateAPIView(APIView):
-    serializer_class = ProductSerializer
 
-    def get(self, request, pk):
-        todo = Products.objects.get(pk=pk)
-        products_serializer = ProductSerializer(todo)
-        return Response(products_serializer.data)
-
->>>>>>> Stashed changes
-    def patch(self, request, pk):
-        title = request.POST.get('title', None)
-        description = request.POST.get('description', None)
-        product = Products.objects.get(pk=pk)
-        if title:
-            product.title = title
-        if description:
-            product.description = description
-        product.save()
-        product_serializer = ProductSerializer(product)
-        return Response(product_serializer.data)
-<<<<<<< Updated upstream
-    
-=======
-
->>>>>>> Stashed changes
-    def delete(self, request, pk):
-        Products.objects.get(pk=pk).delete()
-        return Response(status=204)
-
-<<<<<<< Updated upstream
 
 class GetSectionsAPIView(GenericAPIView):
     permission_classes = ()
@@ -212,6 +177,7 @@ class OrderAPIView(APIView):
                 user_wallet.balance = user_balance
                 user_wallet.save()
 
+
 class SectionsAPIView(GenericAPIView):
     permission_classes = ()
     serializer_class = CategorySerializer
@@ -248,7 +214,7 @@ class ProductSearchViewSet(DocumentViewSet):
         'description',
         'price',
     )
-=======
+
 
 class ProductsFilterView(ListAPIView):
     queryset = Products.objects.all()
@@ -256,7 +222,6 @@ class ProductsFilterView(ListAPIView):
     permission_classes = ()
     filter_backends = (filters.DjangoFilterBackend,)
     filterset_class = ProductsFilter
->>>>>>> Stashed changes
 
     filter_fields = {
         'title': 'title',
@@ -265,7 +230,6 @@ class ProductsFilterView(ListAPIView):
         'price': 'price',
     }
 
-<<<<<<< Updated upstream
     suggester_fields = {
         'title': {
             'field': 'title.suggest',
@@ -334,7 +298,8 @@ class ProductSingleAPIView(GenericAPIView):
             'section': product.category.section.name
         }
         return Response(sections)
-=======
+
+
 class LikeUserAPIView(GenericAPIView):
     permission_classes = (IsAuthenticated,)
     serializer_class = LikeSerializer
@@ -379,4 +344,3 @@ class CommentUserAPIView(GenericAPIView):
             comment_serializer = CommentSerializer(comment)
             return Response(comment_serializer.data)
         return Response({'success': False}, status=401)
->>>>>>> Stashed changes
