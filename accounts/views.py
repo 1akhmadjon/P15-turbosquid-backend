@@ -1,18 +1,21 @@
-from django.contrib.auth.views import get_user_model
 from rest_framework.generics import GenericAPIView
-from rest_framework.response import Response
-from rest_framework.views import APIView
-from rest_framework.permissions import IsAuthenticated
 from rest_framework_simplejwt.token_blacklist.models import OutstandingToken
 
 from accounts.serializers import UserSerializer, UserRegisterSerializer, LogoutSerializer
+from django.shortcuts import render
+from django.contrib.auth.views import get_user_model
+from rest_framework.response import Response
+# from django.contrib.auth.mixins import LoginRequiredMixin
+from rest_framework.views import APIView
+from rest_framework.permissions import IsAuthenticated
+from accounts.serializers import UserSerializer
 from rest_framework_simplejwt.tokens import RefreshToken
 
 User = get_user_model()
 
 
 class RegisterAPIView(GenericAPIView):
-    serializer_class = (UserRegisterSerializer)
+    serializer_class = UserRegisterSerializer
 
     def post(self, request):
         first_name = request.POST.get('first_name')
@@ -71,7 +74,7 @@ class LogoutAPIView(GenericAPIView):
         return Response(status=204)
 
 
-class UserInfoAPIView(GenericAPIView):
+class UserInfoAPIView(APIView):
     permission_classes = (IsAuthenticated,)
 
     def get(self, request):

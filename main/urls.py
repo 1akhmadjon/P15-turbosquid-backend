@@ -15,8 +15,10 @@ from main.views import (
     CategoriesAPIView,
     ProductSingleAPIView,
     CheckoutShoppingcart,
-    OrderAPIView, ProductsFilterView,
-    LikeUserAPIView, LikeDetailUserAPIView,
+    OrderAPIView,
+    ProductsFilterView,
+    LikeUserAPIView,
+    LikeDetailUserAPIView,
     CommentUserAPIView
 )
 
@@ -44,3 +46,5 @@ urlpatterns = [
     path('like-detail', LikeDetailUserAPIView.as_view(), name='like-detail'),  # done
     path('comment/<int:product_id>', CommentUserAPIView.as_view(), name='comment'),  # done
 ]
+
+

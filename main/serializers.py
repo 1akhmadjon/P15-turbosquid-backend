@@ -9,10 +9,10 @@ from .models import (
     Sections,
     Category,
     Comment,
-    Like,
     Order,
     ProductType,
-    Format
+    Format,
+    Like,
 )
 from .tasks import send_email
 
@@ -60,7 +60,6 @@ class ProductSerializer(serializers.ModelSerializer):
 
 
 class ShoppingcartSerializers(serializers.ModelSerializer):
-
     class Meta:
         model = Shoppingcart
         fields = '__all__'
