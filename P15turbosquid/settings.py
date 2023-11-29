@@ -40,7 +40,17 @@ INSTALLED_APPS = [
 
     # third-party
     'rest_framework',
+<<<<<<< Updated upstream
     'rest_framework_simplejwt'
+=======
+    'rest_framework_simplejwt',
+    'dotenv',
+    'mptt',
+    'django_elasticsearch_dsl',
+    'django_elasticsearch_dsl_drf',
+    'django_filters',
+    # 'rest_registration'
+>>>>>>> Stashed changes
 ]
 
 MIDDLEWARE = [
@@ -54,6 +64,14 @@ MIDDLEWARE = [
 ]
 
 ROOT_URLCONF = 'P15turbosquid.urls'
+
+# REST_REGISTRATION = {
+#     'REGISTER_VERIFICATION_URL': 'https://frontend-host/verify-user/',
+#     'RESET_PASSWORD_VERIFICATION_URL': 'https://frontend-host/reset-password/',
+#     'REGISTER_EMAIL_VERIFICATION_URL': 'https://frontend-host/verify-email/',
+#
+#     'VERIFICATION_FROM_EMAIL': 'no-reply@example.com',
+# }
 
 TEMPLATES = [
     {
